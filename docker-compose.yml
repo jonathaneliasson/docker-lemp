@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+
+  nginx01:
+    container_name: nginx01
+    image: nginx
+    volumes:
+      - ./http-data:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - php01
+    networks:
+      - network01
+
+  php01:
+    container_name: php01
+    image: php:7-fpm
+    volumes:
+      - ./http-data:/var/www/html
+    ports:
+      - "9000:9000"
+    networks:
+      - network01
+
+  mariadb01:
+    container_name: mariadb01
+    image: mariadb
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    depends_on:
+      - nginx01
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: example
+    networks:
+      - network01
+
+  phpmyadmin01:
+    container_name: phpmyadmin01
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8183:80"
+    depends_on:
+      - mariadb01
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: mariadb01
+      PMA_USER: user
+      PMA_PASSWORD: password
+    networks:
+      - network01
+
+networks:
+  network01:
