@@ -17,7 +17,7 @@ services:
 
   php01:
     container_name: php01
-    image: php:7-fpm
+    build: ./php-fpm
     volumes:
       - ./http-data:/var/www/html
     ports:
